@@ -1,7 +1,7 @@
 # tagmein
 Tag Me In server software
 
-## Installation on Debian
+## Installation on Ubuntu
 
 ### Step 1: Install nginx
 
@@ -35,3 +35,4 @@ If you visit your website at this point at https://your.domain.here.com you shou
 
 > ```git clone git@github.com:tagmein/tagmein.git```
 
+> ~/tagmein/setup
