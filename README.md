@@ -25,6 +25,12 @@ server {
 
 > ```sudo apt install certbot python3-certbot-nginx```
 
+> ```sudo certbot --nginx -d your.domain.here.com```
+
+If you visit your website at this point at https://your.domain.here.com you should see the "Welcome to nginx!" page and a valid secure connection indicated in your web browser. Now that web hosting and domain are correctly configured, it's time to install Tag Me In!
+
+### Step 3: Install Tag Me In server software
+
 > ```cd ~```
 
 > ```git clone git@github.com:tagmein/tagmein.git```
