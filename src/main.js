@@ -22,7 +22,7 @@ async function finalPath(filePath) {
    }
    else {
     if (data.isDirectory()) {
-     resolve(path.join(filePath, 'index.html'))
+     resolve(path.join(filePath, 'main.html'))
     }
     else {
      resolve(filePath)
@@ -45,13 +45,10 @@ const contentTypes = {
 }
 
 async function replyWithFile(filePath) {
- return new Promise(function (resolve) {
+ return new Promise(function (resolve, reject) {
   fs.readFile(filePath, function (error, content) {
    if (error) {
-    resolve({
-     statusCode: 404,
-     content: 'Not found'
-    })
+    reject(error)
    }
    else {
     const type = path.extname(filePath).substring(1)
@@ -67,16 +64,35 @@ async function replyWithFile(filePath) {
  })
 }
 
+function redirect(to) {
+ return {
+  statusCode: 301,
+  headers: [
+   ['Location', to]
+  ]
+ }
+}
+
 async function reply(requestMethod, requestPath, requestParams, requestBody, requestHeaders) {
+ switch (requestPath) {
+  case '/profile':
+   return redirect('/system/register.html')
+ }
  try {
   const filePath = await finalPath(path.join(rootPath, requestPath))
   return replyWithFile(filePath)
  }
  catch (e) {
+  if (e.code === 'ENOENT') {
+   return {
+    statusCode: 404,
+    content: '<div class="message"><span>Not found</span></div>'
+   }
+  }
   console.error(e)
   return {
    statusCode: 500,
-   content: 'Server error'
+   content: '<div class="message"><span>Server error</span></div>'
   }
  }
 }
@@ -92,7 +108,7 @@ async function main() {
    const {
     statusCode = 200,
     contentType = 'text/plain; charset=utf-8',
-    content,
+    content = '',
     headers = []
    } = await reply(requestMethod, requestPath, requestParams, requestBody, request.headers)
    response.statusCode = statusCode
