@@ -42,7 +42,10 @@ function attachFrameWithContent(attachTo, content) {
  const newFrame = document.createElement('iframe')
  attachTo.appendChild(newFrame)
  newFrame.contentDocument.open()
- newFrame.contentDocument.write(`<!doctype html>
+ newFrame.contentDocument.write(
+  content.startsWith('<!doctype html>')
+   ? content
+   : `<!doctype html>
 <head>
  <meta charset="utf-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1" />

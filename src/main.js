@@ -73,10 +73,30 @@ function redirect(to) {
  }
 }
 
+function html(content, statusCode = 200) {
+ return {
+  statusCode,
+  content: `<!doctype html>
+<head>
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <link href="/main.css" rel="stylesheet" type="text/css" />
+ <style>body { display: none; }</style>
+</head>
+<body tabindex="0" class="display">${content}</body>`,
+  headers: [[
+   'Content-Type', 'text/html; charset=utf-8'
+  ]]
+ }
+}
+
 async function reply(requestMethod, requestPath, requestParams, requestBody, requestHeaders) {
  switch (requestPath) {
   case '/profile':
    return redirect('/system/register.html')
+  case '/register':
+   console.log(requestBody)
+   return html('You registered')
  }
  try {
   const filePath = await finalPath(path.join(rootPath, requestPath))
@@ -84,16 +104,10 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
  }
  catch (e) {
   if (e.code === 'ENOENT') {
-   return {
-    statusCode: 404,
-    content: '<div class="message"><span>Not found</span></div>'
-   }
+   return html('<div class="message"><span>Not found</span></div>', 404)
   }
   console.error(e)
-  return {
-   statusCode: 500,
-   content: '<div class="message"><span>Server error</span></div>'
-  }
+  return html('<div class="message"><span>Server error</span></div>', 500)
  }
 }
 
