@@ -5,7 +5,7 @@ module.exports = {
    headers: [
     ['Content-Type', 'text/html']
    ],
-   content: `<script>top.location.replace('/#${to}')</script>`
+   content: `<!doctype html><head><meta charset="utf-8"><script>top.location.replace('/#${to}')</script></head>`
   }
  }
 }

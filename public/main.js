@@ -1,3 +1,8 @@
+function logout() {
+ localStorage.removeItem('key')
+ window.location.hash = '#profile'
+}
+
 async function main() {
  document.body.classList.remove('no-js')
 
@@ -10,18 +15,44 @@ async function main() {
  }
 
  let activePath = ''
+ window.activeKey = null
+
+ function updateProfile(profile) {
+  document.getElementById('profile-name').innerText = profile?.name ?? profile?.email ?? 'Guest'
+  document.getElementById('profile-menu').style.display = profile?.email ? '' : 'none'
+ }
+
+ updateProfile()
 
  async function navigate() {
   const { hash } = window.location
-  const path = activePath = hash.length > 2 ? hash.replace(/^#/, '/') : '/home'
-
+  const [path, subHash] = hash.length > 2 ? hash.replace(/^#/, '/').split('#') : ['/home']
+  activePath = path
   TagMeIn.content.innerHTML = `<div class="message"><span>Loading "${path}"</span></div>`
   try {
-   const response = await fetch(path)
+   const headers = {}
+   const accountKey = localStorage.getItem('key')
+   if (accountKey?.length > 0) {
+    headers['x-key'] = accountKey
+   }
+   const response = await fetch(path, { headers })
    const content = await response.text()
    if (path === activePath) {
     TagMeIn.content.innerHTML = ''
-    attachFrameWithContent(TagMeIn.content, content)
+    await attachFrameWithContent(
+     TagMeIn.content,
+     content,
+     subHash
+    )
+    const key = localStorage.getItem('key')
+    if (key !== window.activeKey ||
+     location.hash.startsWith('#system/profile.html')) {
+     window.activeKey = key
+     const profileResponse = await fetch('/profile.json', {
+      headers: { 'x-key': key }
+     })
+     updateProfile(await profileResponse.json())
+    }
    }
   }
   catch (e) {
@@ -38,7 +69,7 @@ async function main() {
 
 window.addEventListener('DOMContentLoaded', main)
 
-function attachFrameWithContent(attachTo, content) {
+async function attachFrameWithContent(attachTo, content, contentParamString) {
  const newFrame = document.createElement('iframe')
  attachTo.appendChild(newFrame)
  newFrame.contentDocument.open()
@@ -54,13 +85,17 @@ function attachFrameWithContent(attachTo, content) {
   window.addEventListener('message', function (message) {
    parent.postMessage(message.data)
   })
+  window.urlParams = new URLSearchParams(${JSON.stringify(`?${contentParamString ?? ''}`)})
  </script>
  <style>body { display: none; }</style>
 </head>
 <body tabindex="0" class="display">${content}</body>`)
  newFrame.contentDocument.close()
- setTimeout(function () {
-  newFrame.focus()
-  newFrame.contentWindow?.document?.body?.focus?.()
- }, 250)
+ return new Promise(function (resolve) {
+  setTimeout(function () {
+   newFrame.focus()
+   newFrame.contentWindow?.document?.body?.focus?.()
+   resolve()
+  }, 250)
+ })
 }

@@ -21,7 +21,7 @@ module.exports = {
     code,
     timestamp
    })
-   return redirect(`system/verify.html?email=${encodeURIComponent(email)}`)
+   return redirect(`system/verify.html#email=${encodeURIComponent(email)}`)
   }
   catch (e) {
    return html(`<div class="panel">

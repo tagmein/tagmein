@@ -1,0 +1,25 @@
+<div class="panel">
+ <h1>Complete sign in</h1>
+ <p>You should receive an email from <code>service@tagme.in</code> within 1 minute. Enter the code from the email here
+  to complete the sign in process. The code is valid for 15 minutes, and may only be used once.</p>
+ <form method="POST" action="/verify" enctype="application/x-www-form-urlencoded">
+  <label>
+   <div>Email address</div>
+   <input id="email" required name="email" readonly />
+  </label>
+  <label>
+   <div>Secure code</div>
+   <input id="code" autocomplete="off" required name="code" maxlength="6" type="text" placeholder="••••••" />
+  </label>
+  <button type="submit">Verify</button>
+ </form>
+ <p>
+  <a class="button" target="_top" href="/#profile">&laquo; Start over</a>
+ </p>
+</div>
+<script>
+ document.getElementById('email').value = urlParams.get('email')
+ setTimeout(function () {
+  document.getElementById('code').focus()
+ }, 500)
+</script>

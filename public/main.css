@@ -68,7 +68,8 @@ body.no-js .no-js {
  display: initial;
 }
 
-#tagmein-toolbar a {
+#tagmein-toolbar a,
+#tagmein-toolbar .menu .item {
  line-height: 32px;
  padding: 14px;
 }
@@ -94,7 +95,12 @@ a {
  text-decoration: none;
 }
 
-a:hover {
+.menu .item {
+ cursor: pointer;
+}
+
+a:hover,
+.menu .item:hover {
  background-color: #c9c9c9;
 }
 
@@ -207,7 +213,7 @@ details {
 }
 
 form {
- margin: 30px 0 0;
+ margin: 15px 0 0;
 }
 
 input,
@@ -227,6 +233,13 @@ input,
 textarea,
 select {
  background-color: transparent;
+ width: 100%;
+ max-width: 400px;
+}
+
+textarea {
+ resize: none;
+ height: 120px;
 }
 
 button,
@@ -237,8 +250,34 @@ a.button {
 }
 
 button:hover,
-a.button:hover {
+a.button:hover,
+.menu .item:hover {
  background-color: #d9d9d9;
+}
+
+label {
+ display: block;
+ margin: 15px 0;
+}
+
+.menu {
+ display: flex;
+ flex-direction: row;
+ position: relative;
+}
+
+.menu .reveal {
+ position: absolute;
+ left: 0;
+ right: 0;
+ top: 100%;
+ background-color: #ffffff;
+ box-shadow: 0 0 3px 1px #24242479;
+ display: none;
+}
+
+.menu:hover>.reveal {
+ display: block;
 }
 
 *::selection {

@@ -1,0 +1,11 @@
+<div class="panel">
+ <h1>Welcome</h1>
+ <p>You are now signed in as <code id="email">&lt;email&gt;</code></p>
+ <p>
+  <a class="button" target="_top" href="/#home">Continue</a>
+ </p>
+</div>
+<script>
+ document.getElementById('email').innerText = urlParams.get('email')
+ top.localStorage.setItem('key', urlParams.get('key'))
+</script>
