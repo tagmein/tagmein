@@ -3,7 +3,12 @@
 const [http, fs, path, qs] = 'http fs path querystring'
  .split(' ').map(require)
 
+const { html } = require('./lib/html')
 const { parseRequestBody } = require('./lib/parseRequestBody')
+const { redirect } = require('./lib/redirect')
+const { replyWithFile } = require('./lib/replyWithFile')
+
+const { register } = require('./actions/register')
 
 const portEnv = parseInt(process.env.PORT, 10)
 const port = Number.isFinite(portEnv) && portEnv >= 1 && portEnv < 65536
@@ -32,82 +37,24 @@ async function finalPath(filePath) {
  })
 }
 
-const contentTypes = {
- css: 'text/css',
- gif: 'image/gif',
- html: 'text/html',
- jpeg: 'image/jpeg',
- jpg: 'image/jpeg',
- js: 'application/javascript',
- json: 'application/json',
- png: 'image/png',
- svg: 'image/svg+xml',
-}
-
-async function replyWithFile(filePath) {
- return new Promise(function (resolve, reject) {
-  fs.readFile(filePath, function (error, content) {
-   if (error) {
-    reject(error)
-   }
-   else {
-    const type = path.extname(filePath).substring(1)
-    resolve({
-     statusCode: 200,
-     headers: [
-      ['Content-Type', contentTypes[type] ?? 'text/plain']
-     ],
-     content
-    })
-   }
-  })
- })
-}
-
-function redirect(to) {
- return {
-  statusCode: 301,
-  headers: [
-   ['Location', to]
-  ]
- }
-}
-
-function html(content, statusCode = 200) {
- return {
-  statusCode,
-  content: `<!doctype html>
-<head>
- <meta charset="utf-8" />
- <meta name="viewport" content="width=device-width, initial-scale=1" />
- <link href="/main.css" rel="stylesheet" type="text/css" />
- <style>body { display: none; }</style>
-</head>
-<body tabindex="0" class="display">${content}</body>`,
-  headers: [[
-   'Content-Type', 'text/html; charset=utf-8'
-  ]]
- }
-}
-
 async function reply(requestMethod, requestPath, requestParams, requestBody, requestHeaders) {
  switch (requestPath) {
   case '/profile':
-   return redirect('/system/register.html')
+   return redirect('system/register.html')
   case '/register':
-   console.log(requestBody)
-   return html('You registered')
- }
- try {
-  const filePath = await finalPath(path.join(rootPath, requestPath))
-  return replyWithFile(filePath)
- }
- catch (e) {
-  if (e.code === 'ENOENT') {
-   return html('<div class="message"><span>Not found</span></div>', 404)
-  }
-  console.error(e)
-  return html('<div class="message"><span>Server error</span></div>', 500)
+   return register(requestBody.email)
+  default:
+   try {
+    const filePath = await finalPath(path.join(rootPath, requestPath))
+    return replyWithFile(filePath)
+   }
+   catch (e) {
+    if (e.code === 'ENOENT') {
+     return html('<div class="message"><span>Not found</span></div>', 404)
+    }
+    console.error(e)
+    return html('<div class="message"><span>Server error</span></div>', 500)
+   }
  }
 }
 

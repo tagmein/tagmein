@@ -73,7 +73,8 @@ body.no-js .no-js {
  padding: 14px;
 }
 
-#tagmein-logo, #profile-image {
+#tagmein-logo,
+#profile-image {
  image-rendering: crisp-edges;
  margin-right: 2px;
  vertical-align: -9px;
@@ -127,24 +128,40 @@ h6:first-child {
  margin-top: 0;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
 h6 {
- font-size: inherit;
  margin-bottom: 15px;
 }
 
-h6 + p {
+h6 {
+ font-size: inherit;
+}
+
+h6+p {
  margin-top: 0;
 }
 
 p {
+ margin: 15px 0;
+}
+
+p:last-child {
  margin-bottom: 0;
 }
 
-p + ul {
+p+ul {
  margin-top: 0;
  margin-bottom: 15px;
  list-style-type: disc;
  padding: 0 15px;
+}
+
+ol>li {
+ margin-top: 30px;
 }
 
 ol {
@@ -166,7 +183,7 @@ summary {
  overflow: hidden;
 }
 
-details > summary::after {
+details>summary::after {
  display: block;
  position: absolute;
  top: 30px;
@@ -181,7 +198,7 @@ details > summary::after {
  text-align: center;
 }
 
-details[open] > summary::after {
+details[open]>summary::after {
  content: '\2713';
 }
 
@@ -190,10 +207,14 @@ details {
 }
 
 form {
- margin: 30px 0;
+ margin: 30px 0 0;
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select,
+a.button {
  font-size: inherit;
  font-family: inherit;
  padding: 15px;
@@ -202,12 +223,22 @@ input, button, textarea, select {
  margin-right: 15px;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
  background-color: transparent;
 }
 
-button {
+button,
+a.button {
  background-color: #c9c9c9;
+ cursor: pointer;
+ display: inline-block;
+}
+
+button:hover,
+a.button:hover {
+ background-color: #d9d9d9;
 }
 
 *::selection {

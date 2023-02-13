@@ -61,6 +61,6 @@ function attachFrameWithContent(attachTo, content) {
  newFrame.contentDocument.close()
  setTimeout(function () {
   newFrame.focus()
-  newFrame.contentWindow.document.body.focus()
+  newFrame.contentWindow?.document?.body?.focus?.()
  }, 250)
 }
