@@ -1,1 +1,0 @@
-{"name":"Nate Ferrero","bio":"A person trying to make the world just a little bit more enjoyable for all people and animals"}
