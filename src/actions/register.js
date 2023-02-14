@@ -27,7 +27,7 @@ module.exports = {
    return html(`<div class="panel">
 <h1>Oh no</h1>
 <p>That didn't work because: ${e.message}</p>
-<p><a class="button" target="top" href="/#profile">&laquo; Back</a></p>
+<p><a class="button" target="_top" href="/#profile">&laquo; Back</a></p>
 </div>`)
   }
  }
