@@ -7,7 +7,7 @@ function error(message, email) {
  return html(`<div class="panel">
 <h1>Oh no</h1>
 <p>That didn't work because: ${message}</p>
-<p><a class="button" target="top" href="/#system/verify.html#email=${encodeURIComponent(email)}&unique=${randomCode(10)}">&laquo; Try again</a></p>
+<p><a class="button" target="_top" href="/#system/verify.html#email=${encodeURIComponent(email)}&unique=${randomCode(10)}">&laquo; Try again</a></p>
 </div>`)
 }
 
