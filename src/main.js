@@ -3,6 +3,7 @@
 const [http, fs, path, qs] = 'http fs path querystring'
  .split(' ').map(require)
 
+const { ensureDirectoryExists } = require('./lib/ensureDirectoryExists')
 const { getAccount } = require('./lib/getAccount')
 const { html } = require('./lib/html')
 const { json } = require('./lib/json')
@@ -52,26 +53,39 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
   ? await getAccount(accountKey)
   : undefined
  switch (`${requestMethod} ${requestPath}`) {
+  case 'GET /home':
+   if (!account) {
+    return unauthorized()
+   }
+   const homeDirectory = `home/${account.accountId}`
+   await ensureDirectoryExists(path.join(rootPath, homeDirectory))
+   return redirect(`system/explore.html#${qs.encode({ path: homeDirectory })}`)
+
   case 'POST /profile/update':
    if (!account) {
     return unauthorized()
    }
    await saveAccount(account, requestBodyOther)
    return redirect('profile')
+
   case 'GET /profile.json':
    if (!account) {
     return unauthorized()
    }
    return json(account)
+
   case 'GET /profile':
    if (account) {
     return redirect(`system/profile.html#${qs.encode(account)}`)
    }
    return redirect('system/register.html')
+
   case 'POST /register':
    return register(requestBody.email)
+
   case 'POST /verify':
    return verify(requestBody.email, requestBody.code)
+
   default:
    if (requestMethod !== 'GET') {
     return html('<div class="message"><span>Method not allowed</span></div>', 400)
