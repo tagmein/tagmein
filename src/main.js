@@ -9,10 +9,10 @@ const { json } = require('./lib/json')
 const { parseRequestBody } = require('./lib/parseRequestBody')
 const { redirect } = require('./lib/redirect')
 const { replyWithFile } = require('./lib/replyWithFile')
+const { saveAccount } = require('./lib/saveAccount')
 
 const { register } = require('./actions/register')
 const { verify } = require('./actions/verify')
-const { saveAccount } = require('./lib/saveAccount')
 
 const portEnv = parseInt(process.env.PORT, 10)
 const port = Number.isFinite(portEnv) && portEnv >= 1 && portEnv < 65536
@@ -56,7 +56,7 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
    if (!account) {
     return unauthorized()
    }
-   await saveAccount(account.email, requestBodyOther)
+   await saveAccount(account, requestBodyOther)
    return redirect('profile')
   case 'GET /profile.json':
    if (!account) {

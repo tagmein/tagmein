@@ -4,7 +4,11 @@
   <input type="hidden" name="key" id="key" />
   <label>
    <div>Email address</div>
-   <input id="email" required name="email" readonly disabled />
+   <input id="email" name="email" readonly disabled />
+  </label>
+  <label>
+   <div>Account id</div>
+   <input id="accountId" name="accountId" readonly disabled />
   </label>
   <label>
    <div>Name</div>
@@ -16,10 +20,13 @@
   </label>
   <button type="submit">Save</button>
  </form>
+ <p>Last updated <span id="timestamp"></span></p>
 </div>
 <script>
  document.getElementById('key').value = top.localStorage.getItem('key')
- for (const x of 'email name bio'.split(' ')) {
+ for (const x of 'email accountId name bio'.split(' ')) {
   document.getElementById(x).value = urlParams.get(x)
  }
+ document.getElementById('timestamp').innerText =
+  new Date(parseInt(urlParams.get('timestamp'))).toLocaleString()
 </script>

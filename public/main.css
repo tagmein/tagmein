@@ -221,12 +221,13 @@ button,
 textarea,
 select,
 a.button {
- font-size: inherit;
- font-family: inherit;
- padding: 15px;
  border-radius: 10px;
  border: 1px solid #c9c9c9;
+ font-family: inherit;
+ font-size: inherit;
+ line-height: inherit;
  margin-right: 15px;
+ padding: 10px 15px;
 }
 
 input,

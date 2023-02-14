@@ -1,7 +1,9 @@
 const { data } = require("../lib/data")
+const { getAccount } = require("../lib/getAccount")
 const { html } = require('../lib/html')
 const { randomCode } = require("../lib/randomCode")
 const { redirect } = require("../lib/redirect")
+const { saveAccount } = require("../lib/saveAccount")
 
 function error(message, email) {
  return html(`<div class="panel">
@@ -27,6 +29,11 @@ module.exports = {
    await data.remove(storageKey)
    const key = randomCode(40)
    await data.write(`key:${key}`, { email, timestamp: timestampNow })
+   const account = await getAccount(key)
+   if (!('accountId' in account)) {
+    // new account
+    await saveAccount({ email }, {})
+   }
    return redirect(`system/welcome.html#email=${encodeURIComponent(email)}&key=${key}`)
   }
   catch (e) {
