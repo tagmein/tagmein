@@ -13,12 +13,46 @@ const contentTypes = {
  svg: 'image/svg+xml',
 }
 
+function formatItems(items) {
+ return items.map(function (item) {
+  return {
+   name: item.name,
+   type: item.isDirectory() ? 'directory' : 'file'
+  }
+ })
+}
+
 module.exports = {
  async replyWithFile(filePath) {
   return new Promise(function (resolve, reject) {
-   fs.readFile(filePath, function (error, content) {
+   fs.readFile(filePath, async function (error, content) {
     if (error) {
-     reject(error)
+     if (error.code === 'EISDIR') {
+      try {
+       fs.readdir(filePath, { withFileTypes: true }, function (dirError, items) {
+        if (dirError) {
+         reject(dirError)
+        }
+        else {
+         const dirContent = JSON.stringify(formatItems(items))
+         resolve({
+          statusCode: 200,
+          headers: [
+           ['Content-Length', dirContent.length],
+           ['Content-Type', 'application/json']
+          ],
+          content: dirContent
+         })
+        }
+       })
+      }
+      catch (e) {
+       reject(e)
+      }
+     }
+     else {
+      reject(error)
+     }
     }
     else {
      const type = path.extname(filePath).substring(1)

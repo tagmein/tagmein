@@ -32,11 +32,15 @@ body.display {
  flex-direction: row;
 }
 
-#tagmein-toolbar {
- z-index: 2;
+.toolbar {
+ box-shadow: 0 0 1px 0 #24242479;
  height: 60px;
- box-shadow: 0 0 3px 1px #24242479;
+ z-index: 2;
+}
+
+#tagmein-toolbar.toolbar {
  background-color: #f4f4f4;
+ box-shadow: 0 0 3px 1px #24242479;
 }
 
 #tagmein-content {
@@ -68,8 +72,8 @@ body.no-js .no-js {
  display: initial;
 }
 
-#tagmein-toolbar a,
-#tagmein-toolbar .menu .item {
+.toolbar a,
+.toolbar .menu .item {
  line-height: 32px;
  padding: 14px;
 }

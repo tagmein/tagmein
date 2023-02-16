@@ -23,8 +23,7 @@
  <p>Last updated <span id="timestamp"></span></p>
 </div>
 <script>
- document.getElementById('key').value = top.localStorage.getItem('key')
- for (const x of 'email accountId name bio'.split(' ')) {
+ for (const x of 'key email accountId name bio'.split(' ')) {
   document.getElementById(x).value = urlParams.get(x)
  }
  document.getElementById('timestamp').innerText =

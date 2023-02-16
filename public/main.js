@@ -17,12 +17,28 @@ async function main() {
  let activePath = ''
  window.activeKey = null
 
+ async function checkProfileUpdate() {
+  const key = localStorage.getItem('key')
+  if (key !== window.activeKey ||
+   location.hash.startsWith('#system/profile.html')) {
+   window.activeKey = key
+   const profileResponse = await fetch('/profile.json', {
+    headers: { 'x-key': key }
+   })
+   updateProfile(await profileResponse.json())
+  }
+ }
+
  function updateProfile(profile) {
   document.getElementById('profile-name').innerText = profile?.name ?? profile?.email ?? 'Guest'
   document.getElementById('profile-menu').style.display = profile?.email ? '' : 'none'
  }
 
- updateProfile()
+ await checkProfileUpdate()
+
+ if (window.activeKey === null) {
+  updateProfile()
+ }
 
  async function navigate() {
   const { hash } = window.location
@@ -30,6 +46,10 @@ async function main() {
   activePath = path
   TagMeIn.content.innerHTML = `<div class="message"><span>Loading "${path}"</span></div>`
   try {
+   const subHashParams = new URLSearchParams(`?${subHash}`)
+   if (path === '/system/welcome.html' && subHashParams.get('key')) {
+    localStorage.setItem('key', subHashParams.get('key'))
+   }
    const headers = {}
    const accountKey = localStorage.getItem('key')
    if (accountKey?.length > 0) {
@@ -44,15 +64,7 @@ async function main() {
      content,
      subHash
     )
-    const key = localStorage.getItem('key')
-    if (key !== window.activeKey ||
-     location.hash.startsWith('#system/profile.html')) {
-     window.activeKey = key
-     const profileResponse = await fetch('/profile.json', {
-      headers: { 'x-key': key }
-     })
-     updateProfile(await profileResponse.json())
-    }
+    await checkProfileUpdate()
    }
   }
   catch (e) {
@@ -69,11 +81,16 @@ async function main() {
 
 window.addEventListener('DOMContentLoaded', main)
 
+const sandbox = [
+ 'downloads', 'forms', 'scripts', 'top-navigation'
+].map(x => `allow-${x}`).join(' ')
+
 async function attachFrameWithContent(attachTo, content, contentParamString) {
  const newFrame = document.createElement('iframe')
- attachTo.appendChild(newFrame)
- newFrame.contentDocument.open()
- newFrame.contentDocument.write(
+ newFrame.setAttribute('referrerpolicy', 'no-referrer')
+ newFrame.setAttribute('credentialless', true)
+ newFrame.setAttribute('sandbox', sandbox)
+ newFrame.setAttribute('srcdoc',
   content.startsWith('<!doctype html>')
    ? content
    : `<!doctype html>
@@ -85,16 +102,21 @@ async function attachFrameWithContent(attachTo, content, contentParamString) {
   window.addEventListener('message', function (message) {
    parent.postMessage(message.data)
   })
+  window.addEventListener('focus', function () {
+   document.body.focus()
+  })
+  document.addEventListener('DOMContentLoaded', function () {
+   document.body.focus()
+  })
   window.urlParams = new URLSearchParams(${JSON.stringify(`?${contentParamString ?? ''}`)})
  </script>
  <style>body { display: none; }</style>
 </head>
 <body tabindex="0" class="display">${content}</body>`)
- newFrame.contentDocument.close()
+ attachTo.appendChild(newFrame)
  return new Promise(function (resolve) {
   setTimeout(function () {
    newFrame.focus()
-   newFrame.contentWindow?.document?.body?.focus?.()
    resolve()
   }, 250)
  })

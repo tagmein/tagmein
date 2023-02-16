@@ -24,24 +24,6 @@ const rootPath = path.join(__dirname, '..', 'public')
 
 console.log('Serving', rootPath)
 
-async function finalPath(filePath) {
- return new Promise(function (resolve, reject) {
-  fs.stat(filePath, function (err, data) {
-   if (err) {
-    reject(err)
-   }
-   else {
-    if (data.isDirectory()) {
-     resolve(path.join(filePath, 'main.html'))
-    }
-    else {
-     resolve(filePath)
-    }
-   }
-  })
- })
-}
-
 function unauthorized() {
  return html('<div class="message"><span>Not authorized</span></div>', 401)
 }
@@ -76,7 +58,7 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
 
   case 'GET /profile':
    if (account) {
-    return redirect(`system/profile.html#${qs.encode(account)}`)
+    return redirect(`system/profile.html#${qs.encode({ key: accountKey, ...account })}`)
    }
    return redirect('system/register.html')
 
@@ -86,13 +68,15 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
   case 'POST /verify':
    return verify(requestBody.email, requestBody.code)
 
+  case 'GET /':
+   return replyWithFile(path.join(rootPath, 'main.html'))
+
   default:
    if (requestMethod !== 'GET') {
     return html('<div class="message"><span>Method not allowed</span></div>', 400)
    }
    try {
-    const filePath = await finalPath(path.join(rootPath, requestPath))
-    return replyWithFile(filePath)
+    return replyWithFile(path.join(rootPath, requestPath))
    }
    catch (e) {
     if (e.code === 'ENOENT') {
