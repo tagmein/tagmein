@@ -29,12 +29,13 @@ module.exports = {
    await data.remove(storageKey)
    const key = randomCode(40)
    await data.write(`key:${key}`, { email, timestamp: timestampNow })
-   const account = await getAccount(key)
+   let account = await getAccount(key)
    if (!('accountId' in account)) {
     // new account
-    await saveAccount({ email }, {})
+    account = await saveAccount({ email }, {})
    }
-   return redirect(`system/welcome.html#email=${encodeURIComponent(email)}&key=${key}`)
+   return redirect(`system/welcome.html#email=${encodeURIComponent(email)}` +
+    `&key=${key}&accountId=${account.accountId}`)
   }
   catch (e) {
    return error(e.message, email)

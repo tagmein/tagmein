@@ -52,9 +52,11 @@ async function main() {
    const subHashParams = new URLSearchParams(`?${subHash}`)
    if (path === '/system/welcome.html' && subHashParams.get('key')) {
     localStorage.setItem('key', subHashParams.get('key'))
+    localStorage.setItem('accountId', subHashParams.get('accountId'))
    }
    const headers = {}
    const accountKey = localStorage.getItem('key')
+   const accountId = localStorage.getItem('accountId')
    if (accountKey?.length > 0) {
     headers['x-key'] = accountKey
    }
@@ -68,7 +70,8 @@ async function main() {
      subHash,
      path.startsWith('/system/')
       ? accountKey
-      : null
+      : null,
+     accountId
     )
     await checkProfileUpdate()
    }
@@ -91,7 +94,7 @@ const sandbox = [
  'downloads', 'forms', 'scripts', 'top-navigation'
 ].map(x => `allow-${x}`).join(' ')
 
-async function attachFrameWithContent(attachTo, content, contentParamString, key) {
+async function attachFrameWithContent(attachTo, content, contentParamString, key, accountId) {
  const newFrame = document.createElement('iframe')
  newFrame.setAttribute('referrerpolicy', 'no-referrer')
  newFrame.setAttribute('credentialless', true)
@@ -116,6 +119,7 @@ async function attachFrameWithContent(attachTo, content, contentParamString, key
   })
   window.urlParams = new URLSearchParams(${JSON.stringify(`?${contentParamString ?? ''}`)})
   window.key = ${JSON.stringify(key)}
+  window.accountId = ${JSON.stringify(accountId)}
  </script>
  <style>body { display: none; }</style>
 </head>

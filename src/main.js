@@ -14,6 +14,7 @@ const { saveAccount } = require('./lib/saveAccount')
 
 const { register } = require('./actions/register')
 const { verify } = require('./actions/verify')
+const { createPost } = require('./actions/createPost')
 
 const portEnv = parseInt(process.env.PORT, 10)
 const port = Number.isFinite(portEnv) && portEnv >= 1 && portEnv < 65536
@@ -70,6 +71,9 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
   case 'POST /verify':
    return verify(requestBody.email.toLowerCase(), requestBody.code)
 
+  case 'POST /posts/create':
+   return createPost(account, requestBodyOther)
+
   case 'GET ':
    return replyWithFile(path.join(rootPath, 'main.html'))
 
@@ -103,13 +107,16 @@ async function main() {
     contentType = 'text/plain; charset=utf-8',
     content = '',
     headers = []
-   } = await reply(
+   } = (await reply(
     requestMethod,
     requestPath.replace(/\/$/, ''), // important to prevent listing /home/
     requestParams,
     requestBody,
     request.headers
-   )
+   )) ?? {
+     statusCode: 500,
+     content: 'Server error'
+    }
    response.statusCode = statusCode
    response.setHeader('Content-Type', contentType)
    for (const [k, v] of headers) {

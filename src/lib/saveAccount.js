@@ -4,21 +4,9 @@ const [fs, path] = 'fs path'
 const { data } = require('./data')
 const { randomCode } = require('./randomCode')
 const { ensureDirectoryExists } = require('./ensureDirectoryExists')
+const { saveFile } = require('./saveFile')
 
 const homeRoot = path.join(__dirname, '..', '..', 'public', 'home')
-
-async function saveFile(filePath, contents) {
- return new Promise(function (resolve, reject) {
-  fs.writeFile(filePath, contents, function (error) {
-   if (error) {
-    reject(error)
-   }
-   else {
-    resolve()
-   }
-  })
- })
-}
 
 module.exports = {
  async saveAccount(account, newAccountData) {
@@ -28,6 +16,7 @@ module.exports = {
   const { image, ...privateProfile } = newAccountData
   const accountId = account.accountId ?? randomCode(24) // todo: check for collisions in public
   const publicProfile = {
+   accountId,
    bio: privateProfile.bio,
    name: privateProfile.name,
   }

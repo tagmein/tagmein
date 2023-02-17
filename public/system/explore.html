@@ -8,26 +8,39 @@
   margin-right: 10px;
  }
 
+ #new-post {
+  display: none;
+ }
+
+ .sticky {
+  position: sticky;
+  top: 0;
+ }
+
 </style>
 
 <body class="flex-column">
- <div class="flex-row toolbar">
+ <div class="flex-row toolbar sticky">
+  <span id="feed-author"></span>
  </div>
  <div class="feed">
-  <form id="new-post" class="panel">
+  <form id="new-post" class="panel" method="POST" action="/posts/create" enctype="multipart/form-data">
    <h2>Write a post</h2>
+   <input type="hidden" id="key" name="key" />
+   <input type="hidden" id="path" name="path" />
+   <p id="new-post-author"></p>
    <label>
     <div>Title</div>
     <input class="title" name="title" maxlength="216" />
    </label>
    <label>
     <div>Content</div>
-    <textarea name="content"></textarea>
+    <textarea name="content" maxlength="262144"></textarea>
    </label>
    <div class="buttons">
     <input type="submit" value="Publish" />
-    <button>+ File</button>
-    <button>+ HTML</button>
+    <button disabled>+ File</button>
+    <button disabled>+ HTML</button>
    </div>
   </form>
   <div id="feed"></div>
@@ -41,8 +54,7 @@
 
   const postAuthors = {}
 
-  async function loadAuthor(postAuthor, postData) {
-   const { rootPath } = postData
+  async function loadAuthor(postAuthor, rootPath) {
    if (!(rootPath in postAuthors)) {
     const response = await fetch(`${rootPath}/profile.json`)
     postAuthors[rootPath] = await response.json()
@@ -54,7 +66,13 @@
    if (authorProfile.profileImage) {
     postAuthorImage.style.backgroundImage = `url('${rootPath}/${authorProfile.profileImage}')`
    }
-   const postAuthorName = document.createElement('span')
+   const postAuthorName = document.createElement('a')
+   const authorPath = `home/${authorProfile.accountId}`
+   postAuthorName.setAttribute('target', '_top')
+   postAuthorName.setAttribute(
+    'href',
+    `/#system/explore.html#path=${encodeURIComponent(authorPath)}`
+   )
    postAuthorName.innerText = authorProfile.name
    postAuthor.appendChild(postAuthorImage)
    postAuthor.appendChild(postAuthorName)
@@ -77,9 +95,9 @@
    postTimestamp.setAttribute('href', `/#system/explore.html#path=${encodeURIComponent(postId)}`)
    postInformation.appendChild(postAuthor)
    postInformation.appendChild(postTimestamp)
-   loadAuthor(postAuthor, postData)
+   loadAuthor(postAuthor, postData.rootPath)
    postTimestamp.innerText = new Date(postData.timestamp)
-    .toLocaleString()
+    .toLocaleString().replace(/:\d\d\s/, ' ')
    postElement.appendChild(postInformation)
    if ('content' in postData) {
     const postContent = document.createElement('div')
@@ -146,6 +164,20 @@
   }
 
   async function loadFeed(path) {
+   loadAuthor(
+    document.getElementById('feed-author'),
+    path
+   )
+   const myHome = `home/${window.accountId}`
+   if (path === myHome) {
+    loadAuthor(
+     document.getElementById('new-post-author'),
+     myHome
+    )
+    document.getElementById('new-post').style.display = 'block'
+    document.getElementById('path').value = path
+    document.getElementById('key').value = window.key
+   }
    const response = await fetch(`/${path}`)
    switch (response.headers.get('Content-Type')) {
     case 'application/json':
