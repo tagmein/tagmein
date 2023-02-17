@@ -1,3 +1,15 @@
+<style>
+ .post a {
+  border-bottom: 1px solid;
+ }
+
+ .post .author {
+  display: inline-block;
+  margin-right: 10px;
+ }
+
+</style>
+
 <body class="flex-column">
  <div class="flex-row toolbar">
  </div>
@@ -27,6 +39,27 @@
   const knownPosts = {}
   const feedElement = document.getElementById('feed')
 
+  const postAuthors = {}
+
+  async function loadAuthor(postAuthor, postData) {
+   const { rootPath } = postData
+   if (!(rootPath in postAuthors)) {
+    const response = await fetch(`${rootPath}/profile.json`)
+    postAuthors[rootPath] = await response.json()
+   }
+   const authorProfile = postAuthors[rootPath]
+   postAuthorImage = document.createElement('span')
+   postAuthorImage.classList.add('inline-image')
+   postAuthorImage.classList.add('round')
+   if (authorProfile.profileImage) {
+    postAuthorImage.style.backgroundImage = `url('${rootPath}/${authorProfile.profileImage}')`
+   }
+   const postAuthorName = document.createElement('span')
+   postAuthorName.innerText = authorProfile.name
+   postAuthor.appendChild(postAuthorImage)
+   postAuthor.appendChild(postAuthorName)
+  }
+
   function renderPost(postId, postData) {
    const postElement = document.createElement('div')
    postElement.classList.add('panel')
@@ -36,6 +69,18 @@
     postTitle.innerText = postData.title
     postElement.appendChild(postTitle)
    }
+   const postInformation = document.createElement('p')
+   const postAuthor = document.createElement('span')
+   postAuthor.classList.add('author')
+   const postTimestamp = document.createElement('a')
+   postTimestamp.setAttribute('target', '_top')
+   postTimestamp.setAttribute('href', `/#system/explore.html#path=${encodeURIComponent(postId)}`)
+   postInformation.appendChild(postAuthor)
+   postInformation.appendChild(postTimestamp)
+   loadAuthor(postAuthor, postData)
+   postTimestamp.innerText = new Date(postData.timestamp)
+    .toLocaleString()
+   postElement.appendChild(postInformation)
    if ('content' in postData) {
     const postContent = document.createElement('div')
     postContent.classList.add('content')
@@ -51,17 +96,13 @@
     }
     renderPostContent()
    }
-   const postTimestamp = document.createElement('p')
-   postTimestamp.innerText = new Date(postData.timestamp)
-    .toLocaleString()
-   postElement.appendChild(postTimestamp)
    feedElement.appendChild(postElement)
   }
 
   function processPosts(rootPath, megaSeconds, unstructuredPosts) {
    let foundPostsIds = []
    for (const unstructuredPost of unstructuredPosts) {
-    const [prefix, encodedValue] = unstructuredPost.split('=')
+    const [prefix, encodedValue = ''] = unstructuredPost.split('=')
     const [milliSeconds, encodedKey] = prefix.split('.')
     const [key, value] = [encodedKey, encodedValue]
      .map(decodeURIComponent)
@@ -69,6 +110,7 @@
     if (!(postId in knownPosts)) {
      foundPostsIds.push(postId)
      knownPosts[postId] = {
+      rootPath,
       timestamp: parseInt(megaSeconds, 10) * 1e9
        + parseInt(milliSeconds, 10)
      }

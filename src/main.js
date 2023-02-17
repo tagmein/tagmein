@@ -41,7 +41,9 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
    }
    const homeDirectory = `home/${account.accountId}`
    await ensureDirectoryExists(path.join(rootPath, homeDirectory))
-   return redirect(`system/explore.html#${qs.encode({ path: homeDirectory })}`)
+   return redirect(`system/explore.html#${qs.encode({
+    path: homeDirectory
+   })}`)
 
   case 'POST /profile/update':
    if (!account) {
@@ -58,7 +60,7 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
 
   case 'GET /profile':
    if (account) {
-    return redirect(`system/profile.html#${qs.encode({ key: accountKey, ...account })}`)
+    return redirect(`system/profile.html#${qs.encode(account)}`)
    }
    return redirect('system/register.html')
 

@@ -31,13 +31,16 @@ module.exports = {
    bio: privateProfile.bio,
    name: privateProfile.name,
   }
-  if (image) {
+  if (image?.data?.length > 0) {
    const { filename, data } = image
    const finalFilename = `profile-${randomCode(12)}${path.extname(filename)}`
    publicProfile.profileImage = privateProfile.profileImage = finalFilename
    const fullFinalPath = path.join(homeRoot, accountId, finalFilename)
    await ensureDirectoryExists(path.join(homeRoot, accountId))
    await saveFile(fullFinalPath, data)
+  }
+  else {
+   publicProfile.profileImage = privateProfile.profileImage = account.profileImage
   }
   await saveFile(
    path.join(homeRoot, accountId, 'profile.json'),

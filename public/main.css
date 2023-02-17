@@ -1,9 +1,9 @@
 body,
 html {
  height: 100vh;
+ line-height: 1.65;
  min-height: 100vh;
  overflow: hidden;
- line-height: 1.75;
 }
 
 body {
@@ -78,8 +78,7 @@ body.no-js .no-js {
  padding: 14px;
 }
 
-#tagmein-logo,
-#profile-image {
+.inline-image {
  background-repeat: no-repeat;
  background-size: cover;
  image-rendering: crisp-edges;
@@ -87,13 +86,14 @@ body.no-js .no-js {
  vertical-align: -9px;
 }
 
-#profile-image {
+.inline-image.round {
  height: 32px;
  width: 32px;
  border-radius: 100%;
  box-shadow: 0 0 0 1px #24242479;
  display: inline-block;
  background-color: #c9c9c9;
+ margin-right: 10px;
 }
 
 a {
@@ -146,7 +146,7 @@ h3,
 h4,
 h5,
 h6 {
- margin-bottom: 15px;
+ margin-bottom: 0;
 }
 
 h6 {

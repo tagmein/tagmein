@@ -65,7 +65,10 @@ async function main() {
     await attachFrameWithContent(
      TagMeIn.content,
      content,
-     subHash
+     subHash,
+     path.startsWith('/system/')
+      ? accountKey
+      : null
     )
     await checkProfileUpdate()
    }
@@ -88,7 +91,7 @@ const sandbox = [
  'downloads', 'forms', 'scripts', 'top-navigation'
 ].map(x => `allow-${x}`).join(' ')
 
-async function attachFrameWithContent(attachTo, content, contentParamString) {
+async function attachFrameWithContent(attachTo, content, contentParamString, key) {
  const newFrame = document.createElement('iframe')
  newFrame.setAttribute('referrerpolicy', 'no-referrer')
  newFrame.setAttribute('credentialless', true)
@@ -112,6 +115,7 @@ async function attachFrameWithContent(attachTo, content, contentParamString) {
    document.body.focus()
   })
   window.urlParams = new URLSearchParams(${JSON.stringify(`?${contentParamString ?? ''}`)})
+  window.key = ${JSON.stringify(key)}
  </script>
  <style>body { display: none; }</style>
 </head>
