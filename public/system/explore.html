@@ -1,23 +1,126 @@
 <body class="flex-column">
  <div class="flex-row toolbar">
  </div>
+ <div class="feed">
+  <form id="new-post" class="panel">
+   <h2>Write a post</h2>
+   <label>
+    <div>Title</div>
+    <input class="title" name="title" maxlength="216" />
+   </label>
+   <label>
+    <div>Content</div>
+    <textarea name="content"></textarea>
+   </label>
+   <div class="buttons">
+    <input type="submit" value="Publish" />
+    <button>+ File</button>
+    <button>+ HTML</button>
+   </div>
+  </form>
+  <div id="feed"></div>
+ </div>
  <script>
-  async function load(path) {
-   console.log('path', path)
-   const response = await fetch(`/${path}`, {
-    mode: 'no-cors'
-   })
-   switch (response.headers.get('content-type')) {
+  let totalPostsLoaded = 0
+  const MAX_INITIAL_POST_COUNT = 100
+  const deferredFeedChunkPaths = []
+  const knownPosts = {}
+  const feedElement = document.getElementById('feed')
+
+  function renderPost(postId, postData) {
+   const postElement = document.createElement('div')
+   postElement.classList.add('panel')
+   postElement.classList.add('post')
+   if ('title' in postData) {
+    const postTitle = document.createElement('h1')
+    postTitle.innerText = postData.title
+    postElement.appendChild(postTitle)
+   }
+   if ('content' in postData) {
+    const postContent = document.createElement('div')
+    postContent.classList.add('content')
+    postElement.appendChild(postContent)
+    async function renderPostContent() {
+     const response = await fetch(`${postId}.content`)
+     const textContent = await response.text()
+     for (const textParagraph of textContent.split('\n').filter(x => x.length)) {
+      const paragraph = document.createElement('p')
+      paragraph.innerText = textParagraph
+      postContent.appendChild(paragraph)
+     }
+    }
+    renderPostContent()
+   }
+   const postTimestamp = document.createElement('p')
+   postTimestamp.innerText = new Date(postData.timestamp)
+    .toLocaleString()
+   postElement.appendChild(postTimestamp)
+   feedElement.appendChild(postElement)
+  }
+
+  function processPosts(rootPath, megaSeconds, unstructuredPosts) {
+   let foundPostsIds = []
+   for (const unstructuredPost of unstructuredPosts) {
+    const [prefix, encodedValue] = unstructuredPost.split('=')
+    const [milliSeconds, encodedKey] = prefix.split('.')
+    const [key, value] = [encodedKey, encodedValue]
+     .map(decodeURIComponent)
+    const postId = `${rootPath}/${megaSeconds}/${milliSeconds}`
+    if (!(postId in knownPosts)) {
+     foundPostsIds.push(postId)
+     knownPosts[postId] = {
+      timestamp: parseInt(megaSeconds, 10) * 1e9
+       + parseInt(milliSeconds, 10)
+     }
+    }
+    knownPosts[postId][key] = value
+   }
+   for (const postId of foundPostsIds) {
+    renderPost(postId, knownPosts[postId])
+   }
+   return foundPostsIds.length
+  }
+
+  async function loadFeedChunk(rootPath, megaSeconds) {
+   if (totalPostsLoaded > MAX_INITIAL_POST_COUNT) {
+    deferredFeedChunkPaths.push([rootPath, megaSeconds])
+    return
+   }
+   const response = await fetch(`/${rootPath}/${megaSeconds}`)
+   switch (response.headers.get('Content-Type')) {
     case 'application/json':
      const data = await response.json()
-     console.log(data)
+     totalPostsLoaded += processPosts(
+      rootPath,
+      megaSeconds,
+      data.filter(x => x.type === 'file')
+       .map(x => x.name)
+     )
      break
     default:
      const html = await response.text()
      console.log(html)
    }
   }
-  const path = urlParams.get('path')
-  load(path)
+
+  async function loadFeed(path) {
+   const response = await fetch(`/${path}`)
+   switch (response.headers.get('Content-Type')) {
+    case 'application/json':
+     const data = await response.json()
+     const timeChunks = data.filter(
+      x => x.type === 'directory' && /\d{4,6}/.test(x.name)
+     ).map(x => x.name)
+      .sort()
+     for (const timeChunk of timeChunks) {
+      await loadFeedChunk(path, timeChunk)
+     }
+     break
+    default:
+     const html = await response.text()
+     console.log(html)
+   }
+  }
+  loadFeed(urlParams.get('path'))
  </script>
 </body>

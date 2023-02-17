@@ -1,10 +1,14 @@
 <div class="panel">
  <h1>My profile</h1>
- <form method="POST" action="/profile/update" enctype="application/x-www-form-urlencoded">
+ <form method="POST" action="/profile/update" enctype="multipart/form-data">
   <input type="hidden" name="key" id="key" />
   <label>
    <div>Email address</div>
    <input id="email" name="email" readonly disabled />
+  </label>
+  <label>
+   <div>Image</div>
+   <input id="image" type="file" name="image" />
   </label>
   <label>
    <div>Account id</div>
@@ -18,7 +22,7 @@
    <div>Bio</div>
    <textarea id="bio" name="bio"></textarea>
   </label>
-  <button type="submit">Save</button>
+  <input type="submit" value="Save" />
  </form>
  <p>Last updated <span id="timestamp"></span></p>
 </div>

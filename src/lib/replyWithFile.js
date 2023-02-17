@@ -38,6 +38,7 @@ module.exports = {
          resolve({
           statusCode: 200,
           headers: [
+           ['Access-Control-Allow-Origin', '*'],
            ['Content-Length', dirContent.length],
            ['Content-Type', 'application/json']
           ],
@@ -59,6 +60,7 @@ module.exports = {
      resolve({
       statusCode: 200,
       headers: [
+       ['Access-Control-Allow-Origin', '*'],
        ['Content-Type', contentTypes[type] ?? 'text/plain']
       ],
       content

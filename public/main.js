@@ -32,6 +32,9 @@ async function main() {
  function updateProfile(profile) {
   document.getElementById('profile-name').innerText = profile?.name ?? profile?.email ?? 'Guest'
   document.getElementById('profile-menu').style.display = profile?.email ? '' : 'none'
+  document.getElementById('profile-image').style.backgroundImage = profile?.profileImage
+   ? `url('/home/${profile.accountId}/${profile.profileImage}')`
+   : 'none'
  }
 
  await checkProfileUpdate()

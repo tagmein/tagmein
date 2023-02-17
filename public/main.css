@@ -80,6 +80,8 @@ body.no-js .no-js {
 
 #tagmein-logo,
 #profile-image {
+ background-repeat: no-repeat;
+ background-size: cover;
  image-rendering: crisp-edges;
  margin-right: 2px;
  vertical-align: -9px;
@@ -227,6 +229,7 @@ select,
 a.button {
  border-radius: 10px;
  border: 1px solid #c9c9c9;
+ box-sizing: border-box;
  font-family: inherit;
  font-size: inherit;
  line-height: inherit;
@@ -234,12 +237,11 @@ a.button {
  padding: 10px 15px;
 }
 
-input,
+input:not([type="submit"]),
 textarea,
 select {
  background-color: transparent;
  width: 100%;
- max-width: 400px;
 }
 
 textarea {
@@ -250,12 +252,22 @@ textarea {
 button,
 a.button {
  background-color: #c9c9c9;
+}
+
+input[type="submit"] {
+ background-color: #79c9c9;
+}
+
+button,
+a.button,
+input[type="submit"] {
  cursor: pointer;
  display: inline-block;
 }
 
 button:hover,
 a.button:hover,
+input[type="submit"]:hover,
 .menu .item:hover {
  background-color: #d9d9d9;
 }

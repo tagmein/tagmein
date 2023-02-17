@@ -63,12 +63,12 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
    return redirect('system/register.html')
 
   case 'POST /register':
-   return register(requestBody.email)
+   return register(requestBody.email.toLowerCase())
 
   case 'POST /verify':
-   return verify(requestBody.email, requestBody.code)
+   return verify(requestBody.email.toLowerCase(), requestBody.code)
 
-  case 'GET /':
+  case 'GET ':
    return replyWithFile(path.join(rootPath, 'main.html'))
 
   default:
@@ -101,7 +101,13 @@ async function main() {
     contentType = 'text/plain; charset=utf-8',
     content = '',
     headers = []
-   } = await reply(requestMethod, requestPath, requestParams, requestBody, request.headers)
+   } = await reply(
+    requestMethod,
+    requestPath.replace(/\/$/, ''), // important to prevent listing /home/
+    requestParams,
+    requestBody,
+    request.headers
+   )
    response.statusCode = statusCode
    response.setHeader('Content-Type', contentType)
    for (const [k, v] of headers) {
