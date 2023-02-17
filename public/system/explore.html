@@ -83,7 +83,7 @@
    postElement.classList.add('panel')
    postElement.classList.add('post')
    if ('title' in postData) {
-    const postTitle = document.createElement('h1')
+    const postTitle = document.createElement('h2')
     postTitle.innerText = postData.title
     postElement.appendChild(postTitle)
    }
@@ -135,6 +135,9 @@
     }
     knownPosts[postId][key] = value
    }
+   foundPostsIds.sort(function (a, b) {
+    return knownPosts[b].timestamp - knownPosts[a].timestamp
+   })
    for (const postId of foundPostsIds) {
     renderPost(postId, knownPosts[postId])
    }

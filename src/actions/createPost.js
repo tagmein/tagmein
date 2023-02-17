@@ -32,7 +32,7 @@ module.exports = {
   }
   if (content?.length > 0) {
    const contentFilename = `${milliSeconds}.content`
-   await saveFile(path.join(megaPath, contentFilename))
+   await saveFile(path.join(megaPath, contentFilename), content)
   }
   return redirect(`system/explore.html#${qs.encode({
    path: postPath,

@@ -74,8 +74,8 @@ body.no-js .no-js {
  display: initial;
 }
 
-.toolbar > span,
-.toolbar > a,
+.toolbar>span,
+.toolbar>a,
 .toolbar .menu a,
 .toolbar .menu .item {
  line-height: 32px;
@@ -127,9 +127,9 @@ a:hover,
 }
 
 .panel {
- width: 800px;
+ width: 720px;
  max-width: calc(100% - 60px);
- margin: 60px auto;
+ margin: 20px auto;
  background-color: #ffffff;
  border-radius: 20px;
  padding: 20px;
@@ -140,8 +140,18 @@ h2:first-child,
 h3:first-child,
 h4:first-child,
 h5:first-child,
-h6:first-child {
+h6:first-child,
+p:first-child {
  margin-top: 0;
+}
+
+h1+p,
+h2+p,
+h3+p,
+h4+p,
+h5+p,
+h6+p {
+ margin-top: 5px;
 }
 
 h1,
