@@ -20,10 +20,11 @@
 </style>
 
 <body class="flex-column">
- <div class="flex-row toolbar sticky">
-  <span id="feed-author"></span>
- </div>
  <div class="feed">
+  <div class="panel">
+   <p><span id="feed-author"></span></p>
+   <p id="feed-author-bio"></p>
+  </div>
   <form id="new-post" class="panel" method="POST" action="/posts/create" enctype="multipart/form-data">
    <h2>Write a post</h2>
    <input type="hidden" id="key" name="key" />
@@ -54,7 +55,7 @@
 
   const postAuthors = {}
 
-  async function loadAuthor(postAuthor, rootPath) {
+  async function loadAuthor(postAuthor, rootPath, bioElement) {
    if (!(rootPath in postAuthors)) {
     const response = await fetch(`${rootPath}/profile.json`)
     postAuthors[rootPath] = await response.json()
@@ -76,6 +77,9 @@
    postAuthorName.innerText = authorProfile.name
    postAuthor.appendChild(postAuthorImage)
    postAuthor.appendChild(postAuthorName)
+   if (bioElement) {
+    bioElement.innerText = authorProfile.bio
+   }
   }
 
   function renderPost(postId, postData) {
@@ -169,7 +173,8 @@
   async function loadFeed(path) {
    loadAuthor(
     document.getElementById('feed-author'),
-    path
+    path,
+    document.getElementById('feed-author-bio'),
    )
    const myHome = `home/${window.accountId}`
    if (path === myHome) {

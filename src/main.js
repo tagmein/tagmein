@@ -36,9 +36,9 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
   ? await getAccount(accountKey)
   : undefined
  switch (`${requestMethod} ${requestPath}`) {
-  case 'GET /home':
+  case 'GET /profile':
    if (!account) {
-    return unauthorized()
+    return redirect('system/register.html')
    }
    const homeDirectory = `home/${account.accountId}`
    await ensureDirectoryExists(path.join(rootPath, homeDirectory))
@@ -59,11 +59,17 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
    }
    return json(account)
 
-  case 'GET /profile':
-   if (account) {
-    return redirect(`system/profile.html#${qs.encode(account)}`)
+  case 'GET /home': // needed to prevent listing /home
+   if (!account) {
+    return redirect('system/register.html')
    }
-   return redirect('system/register.html')
+   return redirect('system/home.html')
+
+  case 'GET /profile/edit':
+   if (!account) {
+    return redirect('system/register.html')
+   }
+   return redirect(`system/profile.html#${qs.encode(account)}`)
 
   case 'POST /register':
    return register(requestBody.email.trim().toLowerCase())
