@@ -1,8 +1,8 @@
 body,
 html {
- height: 100vh;
+ height: 100%;
  line-height: 1.65;
- min-height: 100vh;
+ min-height: -webkit-fill-available;
  overflow: hidden;
 }
 
@@ -10,14 +10,13 @@ body {
  background-color: #ededed;
  color: #242424;
  font-family: Tahoma, Verdana, Segoe, "DejaVu Sans", sans-serif;
- padding: 0;
- margin: 0;
  font-size: 18px;
+ margin: 0;
+ padding: 0;
 }
 
 body.display {
  display: block;
- height: 100%;
  overflow-x: hidden;
  overflow-y: auto;
 }
