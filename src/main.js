@@ -66,10 +66,10 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
    return redirect('system/register.html')
 
   case 'POST /register':
-   return register(requestBody.email.toLowerCase())
+   return register(requestBody.email.trim().toLowerCase())
 
   case 'POST /verify':
-   return verify(requestBody.email.toLowerCase(), requestBody.code)
+   return verify(requestBody.email.trim().toLowerCase(), requestBody.code)
 
   case 'POST /posts/create':
    return createPost(account, requestBodyOther)
