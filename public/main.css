@@ -84,7 +84,7 @@ body.no-js .no-js {
 .inline-image {
  background-repeat: no-repeat;
  background-size: cover;
- image-rendering: crisp-edges;
+ image-rendering: pixelated;
  margin-right: 2px;
  vertical-align: -9px;
 }
