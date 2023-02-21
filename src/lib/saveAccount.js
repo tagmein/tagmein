@@ -5,6 +5,7 @@ const { data } = require('./data')
 const { randomCode } = require('./randomCode')
 const { ensureDirectoryExists } = require('./ensureDirectoryExists')
 const { saveFile } = require('./saveFile')
+const { getAccount } = require('./getAccount')
 
 const homeRoot = path.join(__dirname, '..', '..', 'public', 'home')
 
@@ -35,6 +36,10 @@ module.exports = {
    path.join(homeRoot, accountId, 'profile.json'),
    JSON.stringify(publicProfile)
   )
+  const existingAccount = await getAccount(accountId, true)
+  if (existingAccount?.email !== account.email) {
+   await data.write(`account:${accountId}`, { email: account.email })
+  }
   await data.write(`profile:${account.email}`, {
    ...account,
    ...privateProfile,

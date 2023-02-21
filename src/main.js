@@ -3,6 +3,7 @@
 const [http, fs, path, qs] = 'http fs path querystring'
  .split(' ').map(require)
 
+const { data } = require('./lib/data')
 const { ensureDirectoryExists } = require('./lib/ensureDirectoryExists')
 const { getAccount } = require('./lib/getAccount')
 const { html } = require('./lib/html')
@@ -79,6 +80,45 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
 
   case 'POST /posts/create':
    return createPost(account, requestBodyOther)
+
+  case 'OPTIONS /subscription':
+   return {
+    statusCode: 200,
+    headers: [
+     ['Access-Control-Allow-Headers', 'x-key'],
+     ['Access-Control-Allow-Methods', 'POST, GET, OPTIONS'],
+     ['Access-Control-Allow-Origin', '*'],
+    ]
+   }
+
+  case 'GET /subscription':
+   {
+    if (!account) {
+     return unauthorized()
+    }
+    const { to } = requestParams
+    const existingSubscriptions = await data.read(`subscription:${to}`)
+    return json(existingSubscriptions[account.accountId] ?? false)
+   }
+
+  case 'POST /subscription':
+   {
+    if (!account) {
+     return unauthorized()
+    }
+    const { to, subscribe } = requestParams
+    const shouldSubscribe = subscribe === 'true'
+    const subscriptionsKey = `subscription:${to}`
+    const existingSubscriptions = await data.read(subscriptionsKey)
+    if (shouldSubscribe) {
+     existingSubscriptions[account.accountId] = true
+    }
+    else {
+     delete existingSubscriptions[account.accountId]
+    }
+    await data.write(subscriptionsKey, existingSubscriptions)
+    return json(shouldSubscribe)
+   }
 
   case 'GET ':
    return replyWithFile(path.join(rootPath, 'main.html'))

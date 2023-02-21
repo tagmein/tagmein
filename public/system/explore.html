@@ -24,6 +24,13 @@
   <div class="panel">
    <p><span id="feed-author"></span></p>
    <p id="feed-author-bio"></p>
+   <p id="feed-subscribe">
+    <label class="toggle">
+     <input type="checkbox" class="toggle" id="subscribed" />
+     <span class="toggle"></span>
+     subscribed to new post emails
+    </label>
+   </p>
   </div>
   <form id="new-post" class="panel" method="POST" action="/posts/create" enctype="multipart/form-data">
    <h2>Write a post</h2>
@@ -170,7 +177,49 @@
    }
   }
 
+  const subscribedElement = document.getElementById('subscribed')
+  let lastKnownSubscribed = false
+
+  function updateSubscribedCheckbox() {
+   if (lastKnownSubscribed) {
+    subscribedElement.setAttribute('checked', 'checked')
+   }
+   else {
+    subscribedElement.removeAttribute('checked')
+   }
+  }
+
+  async function checkSubscribed(to) {
+   subscribedElement.addEventListener('change', async function () {
+    try {
+     const subscribedResponse = await fetch(
+      `/subscription?to=${encodeURIComponent(to)}&subscribe=${subscribedElement.checked}`,
+      { headers: { 'x-key': window.key }, method: 'POST' }
+     )
+     lastKnownSubscribed = await subscribedResponse.json()
+    }
+    catch (e) {
+     console.error(e)
+     updateSubscribedCheckbox()
+    }
+   })
+   const subscribedResponse = await fetch(
+    `/subscription?to=${encodeURIComponent(to)}`,
+    { headers: { 'x-key': window.key } }
+   )
+   lastKnownSubscribed = await subscribedResponse.json()
+   updateSubscribedCheckbox()
+  }
+
+
+
   async function loadFeed(path) {
+   if (window.accountId) {
+    checkSubscribed(path)
+   }
+   else {
+    document.getElementById('feed-subscribe').remove()
+   }
    loadAuthor(
     document.getElementById('feed-author'),
     path,
